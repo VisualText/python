@@ -9,12 +9,6 @@ You will find python scripts that allow you to call the NLP++ engine in a variet
 1. **[nlpplus.py](https://github.com/VisualText/python/blob/main/nlpplus.py)**: a python script that uses the native NLPPlus python package.
 1. **[deaccent.py](https://github.com/VisualText/python/blob/main/deaccent.py)**: a script to deaccent a file (does not call NLP++).
 
-## NLPPlus Python Package
-
-Here you will find a script for using the [NLPPlus Python Package](https://github.com/VisualText/py-package-nlpengine). This is a native C++ package for Python. The Python script nlpplus.py explains how to [download](https://github.com/VisualText/py-package-nlpengine/releases/latest), install, and use the package.
-
-- **[nlpplus.py](https://github.com/VisualText/python/blob/main/nlpplus.py)**: a python script that uses the native NLPPlus python package.
-
 ## Python Class for NLP++
 
 This is a simple class that calls the NLP Engine as a command line executable. This is suitable for tasks that are not meant for production.
@@ -30,3 +24,17 @@ For this python class to work, you must have the NLP Engine command line executa
 * [Linux NLP Executable](https://github.com/VisualText/nlp-engine-linux)
 * [Windows NLP Executable](https://github.com/VisualText/nlp-engine-windows)
 * [MacOS NLP Executable](https://github.com/VisualText/nlp-engine-mac)
+
+## NLPPlus Python Package Now Released
+
+The NLPPlus Python Package is released and can be found at https://pypi.org/project/NLPPlus/, or you can install it via pip:
+
+```python
+pip install NLPPlus
+```
+
+
+Here you will find a script for using the [NLPPlus Python Package](https://github.com/VisualText/py-package-nlpengine). This is a native C++ package for Python. The Python script nlpplus.py explains how to [download](https://github.com/VisualText/py-package-nlpengine/releases/latest), install, and use the package.
+
+- **[nlpplus.py](https://github.com/VisualText/python/blob/main/nlpplus.py)**: a python script that uses the native NLPPlus python package.
+
