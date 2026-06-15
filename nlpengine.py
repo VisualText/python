@@ -57,15 +57,21 @@ class NLPEngine:
             print(f"An error occurred: {e}")
             return
 
-    def compileAnalyzer(self, analyzerFolder, inputTextPath=None, kbOnly=False):
+    def compileAnalyzer(self, analyzerFolder, inputTextPath=None, kbOnly=False,
+                        analyzerOnly=False):
         """Generate the C++ source trees for the named analyzer.
 
-        Runs nlp.exe in -COMPILE mode (or -COMPILEKB if kbOnly=True),
-        which emits <analyzer>/run/*.cpp + <analyzer>/kb/*.cpp (or just
-        <analyzer>/kb/*.cpp for KB-only). The resulting trees still
-        need to be built into shared libraries before analyzeFile
+        Runs nlp.exe in -COMPILE mode, or -COMPILEKB if kbOnly=True
+        (KB only), or -COMPILEANA if analyzerOnly=True (analyzer rules
+        only, skipping the KB). -COMPILE emits <analyzer>/run/*.cpp +
+        <analyzer>/kb/*.cpp; -COMPILEKB emits just <analyzer>/kb/*.cpp;
+        -COMPILEANA emits just <analyzer>/run/*.cpp. The resulting trees
+        still need to be built into shared libraries before analyzeFile
         with compiled=True will work — use compileLocal() to drive the
         local cmake build via scripts/compile-analyzer.sh.
+
+        Use analyzerOnly=True when only the rules changed and the KB is
+        already compiled. kbOnly and analyzerOnly are mutually exclusive.
 
         inputTextPath: any input text file path; -COMPILE requires one
         but doesn't actually analyze the text. If None, defaults to the
@@ -85,9 +91,11 @@ class NLPEngine:
                 "compileAnalyzer needs an input text file path "
                 "(none provided and analyzer's input/ has no files)"
             )
+        if kbOnly and analyzerOnly:
+            raise ValueError("compileAnalyzer: kbOnly and analyzerOnly are mutually exclusive")
         try:
             executable_path = os.path.join(self.engineDir, "nlp.exe")
-            flag = "-COMPILEKB" if kbOnly else "-COMPILE"
+            flag = "-COMPILEKB" if kbOnly else ("-COMPILEANA" if analyzerOnly else "-COMPILE")
             args = [executable_path, flag, "-ANA", analyzerPath,
                     "-WORK", self.engineDir, inputTextPath]
             subprocess.run(args, check=True, text=True)
@@ -97,7 +105,7 @@ class NLPEngine:
         return analyzerPath
 
     def compileLocal(self, analyzerFolder, inputTextPath, kbOnly=False,
-                     ubuntu="ubuntu-latest"):
+                     analyzerOnly=False, ubuntu="ubuntu-latest"):
         """Run scripts/compile-analyzer.sh to build the analyzer's
         compiled shared libraries locally via cmake.
 
@@ -105,11 +113,17 @@ class NLPEngine:
         which runs nlp.exe -COMPILE first then drives cmake against the
         engine's bundled compile-libs. On success, drops
         <analyzer>/bin/run.so + bin/runu.so + bin/kb.so + bin/kbu.so
-        (or just bin/kb.so + bin/kbu.so for kbOnly).
+        (or just bin/kb.so + bin/kbu.so for kbOnly, or just
+        bin/run.so + bin/runu.so for analyzerOnly).
+
+        Use analyzerOnly=True when only the rules changed and the KB is
+        already compiled. kbOnly and analyzerOnly are mutually exclusive.
 
         After this returns, analyzeFile(..., compiled=True) will load
         the staged libraries.
         """
+        if kbOnly and analyzerOnly:
+            raise ValueError("compileLocal: kbOnly and analyzerOnly are mutually exclusive")
         analyzerPath = os.path.join(self.analyzersDir, analyzerFolder)
         script = os.path.join(self.engineDir, "scripts", "compile-analyzer.sh")
         if not os.path.isfile(script):
@@ -119,6 +133,8 @@ class NLPEngine:
         args = ["bash", script]
         if kbOnly:
             args.append("--kb-only")
+        elif analyzerOnly:
+            args.append("--analyzer-only")
         args.extend([analyzerPath, inputTextPath, ubuntu])
         subprocess.run(args, check=True, text=True)
         return os.path.join(analyzerPath, "bin")
