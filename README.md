@@ -34,28 +34,33 @@ of running interpreted from the `.nlp` source. Build those libraries
 first via `compileLocal()` or by running the platform's
 `scripts/compile-analyzer.{sh,ps1}` directly.
 
-#### `compileAnalyzer(analyzerFolder, inputTextPath=None, kbOnly=False)`
+#### `compileAnalyzer(analyzerFolder, inputTextPath=None, kbOnly=False, analyzerOnly=False)`
 
-Shell out to `nlp.exe -COMPILE` (or `-COMPILEKB` if `kbOnly=True`)
-to generate the analyzer's C++ source trees under
-`<analyzer>/run/*.cpp` and `<analyzer>/kb/*.cpp` (or just `kb/*.cpp`
-for KB-only). The trees still need to be built into shared libraries
-before `analyzeFile(..., compiled=True)` will work — see
+Shell out to `nlp.exe -COMPILE` (or `-COMPILEKB` if `kbOnly=True`, or
+`-COMPILEANA` if `analyzerOnly=True`) to generate the analyzer's C++
+source trees: `-COMPILE` emits both `<analyzer>/run/*.cpp` and
+`<analyzer>/kb/*.cpp`; `-COMPILEKB` emits just `kb/*.cpp`; `-COMPILEANA`
+emits just `run/*.cpp`. The trees still need to be built into shared
+libraries before `analyzeFile(..., compiled=True)` will work — see
 `compileLocal()`.
+
+Use `analyzerOnly=True` when only the rules changed and the KB is
+already compiled. `kbOnly` and `analyzerOnly` are mutually exclusive.
 
 If `inputTextPath` is `None`, the function picks the first text file
 it finds under the analyzer's `input/` directory. The engine
 requires an input file at compile time but doesn't actually analyze
 it for `-COMPILE`.
 
-#### `compileLocal(analyzerFolder, inputTextPath, kbOnly=False, ubuntu="ubuntu-latest")`
+#### `compileLocal(analyzerFolder, inputTextPath, kbOnly=False, analyzerOnly=False, ubuntu="ubuntu-latest")`
 
 Drive the platform's `scripts/compile-analyzer.{sh,ps1}` to do the
 full local build end-to-end: `-COMPILE` step, cmake configure +
 build, and stage the resulting library into `<analyzer>/bin/` under
 every name the engine's load paths look for (`run.<ext>` /
 `runu.<ext>` / `kb.<ext>` / `kbu.<ext>`, or just `kb.<ext>` /
-`kbu.<ext>` for `kbOnly`).
+`kbu.<ext>` for `kbOnly`, or just `run.<ext>` / `runu.<ext>` for
+`analyzerOnly`).
 
 After `compileLocal()` returns, `analyzeFile(..., compiled=True)`
 will load the staged libraries instead of running interpreted.
