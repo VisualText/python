@@ -1,6 +1,7 @@
 import shutil
 import subprocess
 import os
+import json
 
 class NLPEngine:
 
@@ -11,9 +12,41 @@ class NLPEngine:
     def analyzerPath(self, analyzerFolder):
         return os.path.join(self.analyzersDir, analyzerFolder)
     
-    def kbPath(self, analyzerFolder):    
+    def kbPath(self, analyzerFolder):
         return os.path.join(self.analyzerPath(analyzerFolder), "kb", "user")
-    
+
+    def putJsonFile(self, analyzerFolder, jsonPath, name=None):
+        """Place a JSON file in the analyzer's kb/user directory so its
+        json2kbb pass converts it to a KBB on the next run. The file is copied
+        to <analyzer>/kb/user/<name>.json (name defaults to the source file's
+        own name; a .json extension is appended if missing). Returns the
+        destination path."""
+        if not os.path.isfile(jsonPath):
+            raise FileNotFoundError(f"JSON file not found: {jsonPath}")
+        with open(jsonPath, "r", encoding="utf-8") as fh:
+            json.load(fh)  # validate it is JSON before copying
+        target = name if name else os.path.basename(jsonPath)
+        if not target.lower().endswith(".json"):
+            target += ".json"
+        kbdir = self.kbPath(analyzerFolder)
+        os.makedirs(kbdir, exist_ok=True)
+        dest = os.path.join(kbdir, target)
+        shutil.copyfile(jsonPath, dest)
+        return dest
+
+    def putJsonObject(self, analyzerFolder, obj, name):
+        """Write a JSON-serializable value to the analyzer's kb/user directory
+        so its json2kbb pass converts it to a KBB on the next run. Serialized
+        to <analyzer>/kb/user/<name>.json (a .json extension is appended if
+        missing). Returns the destination path."""
+        target = name if name.lower().endswith(".json") else name + ".json"
+        kbdir = self.kbPath(analyzerFolder)
+        os.makedirs(kbdir, exist_ok=True)
+        dest = os.path.join(kbdir, target)
+        with open(dest, "w", encoding="utf-8") as fh:
+            json.dump(obj, fh, ensure_ascii=False, indent=2)
+        return dest
+
     def specPath(self, analyzerFolder):
         return os.path.join(self.analyzerPath(analyzerFolder), "spec")
     
