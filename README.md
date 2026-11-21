@@ -1,5 +1,7 @@
 # Python for NLP++
 
+[![PyPI: NLPPlus](https://img.shields.io/pypi/v/NLPPlus?label=PyPI%20NLPPlus&logo=pypi&logoColor=white)](https://pypi.org/project/NLPPlus/) [![npm: nlpplus](https://img.shields.io/npm/v/nlpplus?label=npm%20nlpplus&logo=npm)](https://www.npmjs.com/package/nlpplus)
+
 You will find python scripts that allow you to call the NLP++ engine in a variety of ways.
 
 ## Files in This Repository
