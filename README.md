@@ -80,6 +80,6 @@ pip install NLPPlus
 ```
 
 
-Here you will find a script for using the [NLPPlus Python Package](https://github.com/VisualText/py-package-nlpengine). This is a native C++ package for Python. The Python script nlpplus.py explains how to [download](https://github.com/VisualText/py-package-nlpengine/releases/latest), install, and use the package.
+Here you will find a script for using the [NLPPlus Python Package](https://pypi.org/project/NLPPlus/). This is a native C++ package for Python. The Python script nlpplus.py explains how to [download](https://github.com/VisualText/py-package-nlpengine/releases/latest), install, and use the package.
 
 - **[nlpplus.py](https://github.com/VisualText/python/blob/main/nlpplus.py)**: a python script that uses the native NLPPlus python package.
